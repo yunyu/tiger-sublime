@@ -1,0 +1,221 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+file_extensions:
+  - tig
+scope: source.tig
+variables:
+  identifier: '[_$[:alpha:]][_$[:alnum:]]*'
+
+contexts:
+  # The prototype context is prepended to all contexts but those setting
+  # meta_include_prototype: false.
+  main:
+    - include: comments
+    - include: parens
+    - include: braces
+    - include: brackets
+    - include: keywords
+    - include: functions
+    - include: storage
+    - include: var-def
+    - include: type-def
+    - include: numbers
+    - include: strings
+    - include: assignment
+    - include: binary-operators
+    - include: punctuation
+    - include: expect-type
+    - include: builtin-functions
+    - include: builtin-types
+
+  comments:
+    # Block comments begin with /* and ends with */
+    - match: '/\*'
+      scope: punctuation.definition.comment.tig
+      push: 
+        - meta_scope: comment.block.tig
+        - match: '\*/'
+          pop: true
+
+  parens:
+    - meta_scope: meta.group.tig
+    - match: '\('
+      scope: punctuation.definition.group.begin.tig
+      push:
+        - match: '\)'
+          scope: punctuation.definition.group.end.tig
+          pop: true
+        - include: main
+    - match: '\)'
+      scope: invalid.illegal.stray-bracket-end.tig
+
+  braces:
+    - meta_scope: meta.braces.tig
+    - match: '\{'
+      scope: punctuation.definition.braces.begin.tig
+      push:
+        - match: '\}'
+          scope: punctuation.definition.braces.end.tig
+          pop: true
+        - include: main
+    - match: '\}'
+      scope: invalid.illegal.stray-bracket-end.tig
+
+  brackets:
+    - meta_scope: meta.brackets.tig
+    - match: '\['
+      scope: punctuation.definition.brackets.begin.tig
+      push:
+        - match: '\]'
+          scope: punctuation.definition.brackets.end.tig
+          pop: true
+        - include: main
+    - match: '\]'
+      scope: invalid.illegal.stray-bracket-end.tig
+
+  keywords:
+    # Keywords are if, else for and while.
+    # Note that blackslashes don't need to be escaped within single quoted
+    # strings in YAML. When using single quoted strings, only single quotes
+    # need to be escaped: this is done by using two single quotes next to each
+    # other.
+    - match: '\b(if|else|for|while|to|do|then|break)\b'
+      scope: keyword.control.tig
+    - match: '\b(let|in|end)\b'
+      scope: keyword.other.tig
+
+  storage:
+      - match: '\b(array|primitive|of)\b'
+        scope: storage.type.tig
+
+  var-def:
+      - match: '\b(var)\b'
+        scope: storage.type.tig
+        push:
+        - match: '{{identifier}}'
+          scope: variable.other.readwrite.tig
+          pop: true
+
+  tyfields:
+    - include: comments
+    - include: expect-type
+    - match: ','
+      scope: punctuation.separator.parameters.tig
+    - match: '{{identifier}}'
+      scope: variable.parameter.tig
+
+  type-def:
+      - match: '\b(type)\b'
+        scope: storage.type.tig
+        push:
+        - match: '$'
+          pop: true
+        - include: assignment
+        - include: storage
+        - match: '{{identifier}}'
+          scope: entity.name.class.tig
+        - match: '(?=\{)'
+          set:
+            - match: \{
+              scope: meta.type.parameters.tig punctuation.section.parameters.begin.tig
+              set:
+              - meta_content_scope: meta.type.parameters.tig
+              - match: \}
+                scope: punctuation.section.parameters.end.tig
+                pop: true
+              - include: tyfields
+
+  numbers:
+    - match: \b(?i)([1-9][\d_]*|0)\b
+      scope: constant.numeric.integer.decimal.tig
+
+  strings:
+    # Strings begin and end with quotes, and use backslashes as an escape
+    # character.
+    - match: '"'
+      scope: punctuation.definition.string.begin.tig
+      push: inside_string
+
+  inside_string:
+    - meta_include_prototype: false
+    - meta_scope: string.quoted.double.tig
+    - match: '\.'
+      scope: constant.character.escape.tig
+    - match: '"'
+      scope: punctuation.definition.string.end.tig
+      pop: true
+
+  functions:
+      - match: '\b(function)\b'
+        scope: storage.type.function.tig
+        push:
+        - match: '='
+          scope: punctuation.section.function.begin.tig
+          pop: true
+        - match: '(?={{identifier}})'
+          push:
+            - meta_content_scope: entity.name.function.tig
+            - include: generic-names
+            - match: ''
+              pop: true
+        - match: '(?=\()'
+          set:
+            - match: \(
+              scope: meta.function.parameters.tig punctuation.section.parameters.begin.tig
+              set:
+              - meta_content_scope: meta.function.parameters.tig
+              - match: \)
+                scope: punctuation.section.parameters.end.tig
+                pop: true
+              - include: tyfields
+
+  assignment:
+      - match: ':=|='
+        scope: keyword.operator.assignment.tig
+
+  binary-operators:
+    - match: <\=|>\=|\=\=|<|>|\!\=
+      scope: keyword.operator.comparison.tig
+    - match: \+|\-|\*|/|&|\|
+      scope: keyword.operator.arithmetic.tig
+
+  punctuation:
+    - match: ;
+      scope: punctuation.terminator.statement.tig
+    - match: ','
+      scope: punctuation.separator.tig
+    - match: '\.'
+      scope: punctuation.accessor.tig
+      push:
+        - match: '{{identifier}}'
+          scope: variable.other.member.tig
+          pop: true
+
+  expect-type:
+    - match: ':'
+      scope: punctuation.separator.tig
+      push:
+        - match: '{{identifier}}'
+          scope: entity.name.class.tig
+          pop: true
+
+  builtin-functions:
+    - match: |-
+        (?x)\b(
+          chr|concat|exit|flush|getchar|not|ord|print|size|substring
+        )\b
+      scope: support.function.builtin.tig
+
+  builtin-types:
+    - match: |-
+        (?x)\b(
+          int|string
+        )\b
+      scope: entity.name.class.tig
+    - match: (?x)\b(nil)\b
+      scope: constant.language.tig
+
+  generic-names:
+    - match: '{{identifier}}'
+      scope: meta.generic-name.tig
