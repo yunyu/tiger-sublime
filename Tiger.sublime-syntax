@@ -130,7 +130,7 @@ contexts:
               - include: tyfields
 
   numbers:
-    - match: \b(?i)([1-9][\d_]*|0)\b
+    - match: \b(?i)([0-9][\d_]*)\b
       scope: constant.numeric.integer.decimal.tig
 
   strings:
