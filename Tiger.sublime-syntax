@@ -28,6 +28,8 @@ contexts:
     - include: expect-type
     - include: builtin-functions
     - include: builtin-types
+    - include: function-call
+    - include: record-create
 
   comments:
     # Block comments begin with /* and ends with */
@@ -200,13 +202,6 @@ contexts:
           scope: entity.name.class.tig
           pop: true
 
-  builtin-functions:
-    - match: |-
-        (?x)\b(
-          chr|concat|exit|flush|getchar|not|ord|print|size|substring
-        )\b
-      scope: support.function.builtin.tig
-
   builtin-types:
     - match: |-
         (?x)\b(
@@ -219,3 +214,25 @@ contexts:
   generic-names:
     - match: '{{identifier}}'
       scope: meta.generic-name.tig
+
+  function-call:
+    - match: ({{identifier}})\s*(\()
+      captures:
+        1: variable.function.tig
+        2: punctuation.definition.group.begin.tig
+      push:
+      - match: '\)'
+        scope: punctuation.definition.group.end.tig
+        pop: true
+      - include: main
+
+  record-create:
+    - match: ({{identifier}})\s*(\{)
+      captures:
+        1: entity.name.class.tig
+        2: punctuation.definition.braces.begin.tig
+      push:
+      - match: '\}'
+        scope: punctuation.definition.braces.end.tig
+        pop: true
+      - include: main

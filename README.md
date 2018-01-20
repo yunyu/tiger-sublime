@@ -17,7 +17,7 @@ There is currently no support for highlighting specific expressions types (outsi
 Example
 ==
 
-![](https://i.imgur.com/DU8icOQ.png)
+![](https://i.imgur.com/NnAE7kf.png)
 
 I've clicked through most of the files in the provided testcases and everything that's implemented looks correct.
 
