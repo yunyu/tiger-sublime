@@ -29,6 +29,7 @@ contexts:
     - include: builtin-functions
     - include: builtin-types
     - include: function-call
+    - include: array-create
     - include: record-create
 
   comments:
@@ -195,12 +196,12 @@ contexts:
           pop: true
 
   expect-type:
+    - match: '(:)\s*({{identifier}})'
+      captures: 
+        1: punctuation.separator.tig
+        2: entity.name.class.tig
     - match: ':'
       scope: punctuation.separator.tig
-      push:
-        - match: '{{identifier}}'
-          scope: entity.name.class.tig
-          pop: true
 
   builtin-types:
     - match: |-
@@ -216,23 +217,13 @@ contexts:
       scope: meta.generic-name.tig
 
   function-call:
-    - match: ({{identifier}})\s*(\()
-      captures:
-        1: variable.function.tig
-        2: punctuation.definition.group.begin.tig
-      push:
-      - match: '\)'
-        scope: punctuation.definition.group.end.tig
-        pop: true
-      - include: main
+    - match: '{{identifier}}(?=\s*\()'
+      scope: variable.function.tig
+
+  array-create:
+    - match: '{{identifier}}(?=\s*\[.*\]\s*of\b)'
+      scope: entity.name.class.tig
 
   record-create:
-    - match: ({{identifier}})\s*(\{)
-      captures:
-        1: entity.name.class.tig
-        2: punctuation.definition.braces.begin.tig
-      push:
-      - match: '\}'
-        scope: punctuation.definition.braces.end.tig
-        pop: true
-      - include: main
+    - match: '{{identifier}}(?=\s*\{)'
+      scope: entity.name.class.tig

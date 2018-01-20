@@ -11,8 +11,8 @@ It currently has highlighting support for:
 - Braces, brackets, and parentheses
 - Function declarations with tyfields/typeid
 - Type declarations with typeid/tyfields/array
-
-There is currently no support for highlighting specific expressions types (outside of nil), but being able to visually distinguish operators, numbers, and comments is way better than nothing. I may gradually add features throughout the semester.
+- Function calls
+- Array and record creation
 
 Example
 ==
