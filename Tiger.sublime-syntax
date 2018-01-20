@@ -93,12 +93,10 @@ contexts:
         scope: storage.type.tig
 
   var-def:
-      - match: '\b(var)\b'
-        scope: storage.type.tig
-        push:
-        - match: '{{identifier}}'
-          scope: variable.other.readwrite.tig
-          pop: true
+      - match: '\b(var)\s*({{identifier}})'
+        captures:
+          1: storage.type.tig
+          2: variable.other.readwrite.tig
 
   tyfields:
     - include: comments
@@ -143,7 +141,7 @@ contexts:
   inside_string:
     - meta_include_prototype: false
     - meta_scope: string.quoted.double.tig
-    - match: '\.'
+    - match: '\\.'
       scope: constant.character.escape.tig
     - match: '"'
       scope: punctuation.definition.string.end.tig
@@ -190,10 +188,9 @@ contexts:
       scope: punctuation.separator.tig
     - match: '\.'
       scope: punctuation.accessor.tig
-      push:
-        - match: '{{identifier}}'
-          scope: variable.other.member.tig
-          pop: true
+    - match: (?<=\.)\s*({{identifier}})
+      captures: 
+        1: variable.other.member.tig
 
   expect-type:
     - match: '(:)\s*({{identifier}})'

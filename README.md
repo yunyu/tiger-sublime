@@ -17,7 +17,7 @@ It currently has highlighting support for:
 Example
 ==
 
-![](https://i.imgur.com/NnAE7kf.png)
+![](https://i.imgur.com/yKZLMOi.png)
 
 I've clicked through most of the files in the provided testcases and everything that's implemented looks correct.
 
