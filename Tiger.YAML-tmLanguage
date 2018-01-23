@@ -71,7 +71,7 @@ repository:
     - begin: >-
         (?x)
           \b(function)
-          \s*([[:alpha:]][_[:alnum:]]*)
+          \s*([[:alpha:]][_[:alnum:]]*)?
       beginCaptures:
         '1': {name: storage.type.function.tig}
         '2': {name: entity.name.function.tig}
