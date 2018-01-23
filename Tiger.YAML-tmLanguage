@@ -1,0 +1,190 @@
+# [PackageDev] target_format: plist, ext: tmLanguage
+---
+name: Tiger
+fileTypes: [tig]
+scopeName: source.tig
+uuid: 65707da3-b0b0-4975-a180-b4611d0edfda
+
+patterns:
+- include: '#comments'
+- include: '#keywords'
+- include: '#numbers'
+- include: '#strings'
+- include: '#assignment'
+- include: '#binary-operators'
+- include: '#punctuation'
+- include: '#literal-function'
+- include: '#literal-typedef'
+- include: '#function-call'
+- include: '#var-init'
+- include: '#array-create'
+- include: '#record-create'
+- include: '#braces'
+
+repository:
+  keywords:
+    patterns:
+    - name: keyword.control.tig
+      match: \b(if|else|for|while|to|do|then|break)\b
+    - name: keyword.other.tig
+      match: \b(let|in|end)\b
+    - match: \b(array|primitive|of)\b
+      name: storage.type.tig
+    - match: \b(nil)\b
+      name: constant.language.tig
+  numbers:
+    patterns:
+    - match: \b([0-9][\d]*)
+      name: constant.numeric.integer.decimal.tig
+  strings:
+    name: string.quoted.double.tig
+    begin: \"
+    end: \"
+    patterns:
+    - name: constant.character.escape.tig
+      match: \\.
+  comments:
+    patterns:
+    - begin: /\*
+      captures:
+        '0':
+          name: punctuation.definition.comment.tig
+      end: \*/
+      name: comment.block.tig
+  assignment:
+    match: ':=|='
+    name: keyword.operator.assignment.tig
+  binary-operators:
+    patterns:
+    - match: <\=|>\=|\=\=|<|>|\!\=
+      name: keyword.operator.comparison.tig
+    - match: \+|\-|\*|/|&|\|
+      name: keyword.operator.arithmetic.tig
+  punctuation:
+    patterns:
+    - match: ';'
+      name: punctuation.terminator.statement.tig
+    - match: ','
+      name: punctuation.separator.tig
+  literal-function:
+    patterns:
+    - begin: >-
+        (?x)
+          \b(function)
+          \s*([[:alpha:]][_[:alnum:]]*)
+      beginCaptures:
+        '1': {name: storage.type.function.tig}
+        '2': {name: entity.name.function.tig}
+      end: (?<=\=)
+      patterns:
+      - include: '#function-declaration-parameters'
+      - include: '#function-return-type'
+      - include: '#assignment'
+  function-declaration-parameters:
+    patterns:
+    - begin: \(
+      beginCaptures:
+        '0': {name: punctuation.definition.parameters.begin.tig}
+      end: \)
+      endCaptures:
+        '0': {name: punctuation.definition.parameters.end.tig}
+      patterns:
+      - include: '#comments'
+      - name: variable.parameter.function.tig
+        match: ([[:alpha:]][_[:alnum:]]*)
+      - name: punctuation.separator.parameter.function.tig
+        match: ','
+      - include: '#function-param-type'
+  function-param-type:
+    begin: ':'
+    beginCaptures:
+      '0': {name: punctuation.separator.tig}
+    end: (?=[,)])
+    patterns:
+    - include: '#comments'
+    - name: entity.name.class.tig
+      match: ([[:alpha:]][_[:alnum:]]*)
+  function-return-type:
+    begin: ':'
+    beginCaptures:
+      '0': {name: punctuation.separator.tig}
+    end: (?=\=)
+    patterns:
+    - include: '#comments'
+    - name: entity.name.class.tig
+      match: ([[:alpha:]][_[:alnum:]]*)
+  function-call:
+      match: '([[:alpha:]][_[:alnum:]]*)(?=\s*\()'
+      name: variable.function.tig
+  literal-typedef:
+    patterns:
+    - begin: >-
+        (?x)
+          \b(type)
+          \s*([[:alpha:]][_[:alnum:]]*)\s*(?=\=)
+      beginCaptures:
+        '1': {name: storage.type.tig}
+        '2': {name: entity.name.class.tig}
+      end: $
+      patterns:
+      - include: '#comments'
+      - include: '#assignment'
+      - include: '#keywords'
+      - name: entity.name.class.tig
+        match: ([[:alpha:]][_[:alnum:]]*)
+      - include: '#typedef-record-parameters'
+  typedef-record-parameters:
+    patterns:
+    - begin: \{
+      beginCaptures:
+        '0': {name: punctuation.definition.braces.begin.tig}
+      end: \}
+      endCaptures:
+        '0': {name: punctuation.definition.braces.end.tig}
+      patterns:
+      - include: '#comments'
+      - name: variable.parameter.function.tig
+        match: ([[:alpha:]][_[:alnum:]]*)
+      - name: punctuation.separator.parameter.function.tig
+        match: ','
+      - include: '#typedef-record-param-type'
+  typedef-record-param-type:
+    begin: ':'
+    beginCaptures:
+      '0': {name: punctuation.separator.tig}
+    end: (?=[,}])
+    patterns:
+    - include: '#comments'
+    - name: entity.name.class.tig
+      match: ([[:alpha:]][_[:alnum:]]*)
+  var-init:
+    begin: \b(var)\b
+    beginCaptures:
+      '0': { name: storage.type.tig }
+    end: \:\=
+    endCaptures:
+      '0': { name: keyword.operator.assignment.tig }
+    patterns:
+    - include: '#comments'
+    - include: '#var-init-param-type'
+  var-init-param-type:
+    begin: ':'
+    beginCaptures:
+      '0': {name: punctuation.separator.tig}
+    end: (?=\:\=)
+    patterns:
+    - include: '#comments'
+    - name: entity.name.class.tig
+      match: ([[:alpha:]][_[:alnum:]]*)
+  array-create:
+    match: '([[:alpha:]][_[:alnum:]]*)(?=\s*\[.*\]\s*of\b)'
+    name: entity.name.class.tig
+  record-create:
+    match: '([[:alpha:]][_[:alnum:]]*)(?=\s*\{)'
+    name: entity.name.class.tig
+  braces:
+    patterns:
+    - match: \{
+      name: punctuation.definition.block.tig
+    - match: \}
+      name: punctuation.definition.block.tig
